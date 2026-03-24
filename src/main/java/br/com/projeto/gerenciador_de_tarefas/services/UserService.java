@@ -63,6 +63,14 @@ public class UserService {
         loginRepository.deleteById(id);
     }
 
+    public User updateUser(Long id, User newUser){
+        var optionalUser = getUserById(id);
+        if (optionalUser.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!");
+        }
+        newUser.setIdUser(id);
+        return userRepository.save(newUser);
+    }
 
 
 
