@@ -1,5 +1,6 @@
 package br.com.projeto.gerenciador_de_tarefas.models;
 
+import br.com.projeto.gerenciador_de_tarefas.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

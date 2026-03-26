@@ -1,4 +1,4 @@
-package br.com.projeto.gerenciador_de_tarefas.models;
+package br.com.projeto.gerenciador_de_tarefas.enums;
 
 public enum Status {
     ToDo,

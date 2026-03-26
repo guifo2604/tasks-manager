@@ -23,8 +23,8 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> addTask(@RequestBody Task task){
-        var tasks = service.addTask(task);
+    public ResponseEntity<Task> addTask(@RequestBody Task task, Long userId){
+        var tasks = service.addTask(task,userId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

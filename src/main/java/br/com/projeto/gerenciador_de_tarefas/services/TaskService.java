@@ -1,6 +1,8 @@
 package br.com.projeto.gerenciador_de_tarefas.services;
 
 import br.com.projeto.gerenciador_de_tarefas.models.Task;
+import br.com.projeto.gerenciador_de_tarefas.models.User;
+import br.com.projeto.gerenciador_de_tarefas.services.UserService;
 import br.com.projeto.gerenciador_de_tarefas.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,15 +16,18 @@ import java.util.Optional;
 public class TaskService {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private TaskRepository repository;
 
     public List<Task> getTask(){ return repository.findAll(); }
 
-
-
-    public Task addTask(Task task){
-        repository.save(task);
-        return task;
+    public Task addTask(Task task, Long userId){
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
+        task.setUser(user);
+        return repository.save(task);
     }
 
     public Optional<Task> getTaskById(Long id){
