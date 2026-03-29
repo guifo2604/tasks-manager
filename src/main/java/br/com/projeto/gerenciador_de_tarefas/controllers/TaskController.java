@@ -17,13 +17,13 @@ public class TaskController {
     @Autowired
     private TaskService service;
 
-    @GetMapping
-    public List<Task> getTasks(){
-        return service.getTask();
+    @GetMapping("/user/{userId}")
+    public List<Task> getTasks(@PathVariable Long userId){
+        return service.getTaskByUser(userId);
     }
 
-    @PostMapping
-    public ResponseEntity<Task> addTask(@RequestBody Task task, Long userId){
+    @PostMapping("/{userId}")
+    public ResponseEntity<Task> addTask(@RequestBody Task task, @PathVariable Long userId){
         var tasks = service.addTask(task,userId);
 
         return ResponseEntity
@@ -38,16 +38,16 @@ public class TaskController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
-        service.deletTask(id);
+    @DeleteMapping("/{id}/user/{userId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id, @PathVariable Long userId){
+        service.deleteTask(id, userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task newTask){
-        Task task = service.updateTask(id, newTask);
+    @PutMapping("{id}/user/{userId}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @PathVariable Long userId, @RequestBody Task newTask){
+        Task task = service.updateTask(id, newTask, userId);
         return ResponseEntity.ok(task);
-    }
+        }
 
 }

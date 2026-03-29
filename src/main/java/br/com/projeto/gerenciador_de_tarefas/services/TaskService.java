@@ -21,9 +21,11 @@ public class TaskService {
     @Autowired
     private TaskRepository repository;
 
-    public List<Task> getTask(){ return repository.findAll(); }
+    public List<Task> getTaskByUser(Long userId){
+        return repository.findBy_IdUser(userId);
+    }
 
-    public Task addTask(Task task, Long userId){
+    public Task addTask(@org.jetbrains.annotations.NotNull Task task, Long userId){
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
         task.setUser(user);
@@ -36,23 +38,29 @@ public class TaskService {
     }
 
 
-    public void deletTask(Long id){
-        var optionalTask = getTaskById(id);
-        if(optionalTask.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa Não encontrada");
+    public void deleteTask(Long id, Long userId){
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada!"));
+        if(!task.getUser().getIdUser().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Voce nao tem permissao para deletar a task!");
         }
-        repository.deleteById(id);
+        repository.delete(task);
     }
 
-    public Task updateTask(Long id, Task newTask){
-        var optionalTask = getTaskById(id);
-        if(optionalTask.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada");
+    public Task updateTask(Long id, Task newTask, Long userId){
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada!"));
+        if(!task.getUser().getIdUser().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Voce nao  tem permissao para atualizar a task!");
         }
-        // var task = optionalTask.get();
-        // BeanUtils.copyProperties(newTask,task,"id");
-        newTask.setId(id);
-        return repository.save(newTask);
+        task.setTitle(newTask.getTitle());
+        task.setCaption(newTask.getCaption());
+        task.setContent(newTask.getContent());
+        task.setStatus(newTask.getStatus());
+        task.setDataInicial(newTask.getDataInicial());
+        task.setDataFinal(newTask.getDataFinal());
+
+        return repository.save(task);
 
 
     }
