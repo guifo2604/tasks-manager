@@ -43,7 +43,7 @@ public class TaskController {
         service.deletTask(id);
         return ResponseEntity.noContent().build();
     }
-
+  // teste commit
     @PutMapping("{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task newTask){
         Task task = service.updateTask(id, newTask);
