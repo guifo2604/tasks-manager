@@ -4,6 +4,7 @@ package br.com.projeto.gerenciador_de_tarefas.controllers;
 import br.com.projeto.gerenciador_de_tarefas.models.User;
 import br.com.projeto.gerenciador_de_tarefas.models.UserLogin;
 import br.com.projeto.gerenciador_de_tarefas.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user){
+    public ResponseEntity<User> addUser(@Valid @RequestBody User user){
         var users = userService.addUser(user, user.getPassword());
         return ResponseEntity
                 .status(HttpStatus.CREATED)

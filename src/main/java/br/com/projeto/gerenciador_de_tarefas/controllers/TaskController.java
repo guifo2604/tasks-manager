@@ -3,6 +3,7 @@ package br.com.projeto.gerenciador_de_tarefas.controllers;
 
 import br.com.projeto.gerenciador_de_tarefas.models.Task;
 import br.com.projeto.gerenciador_de_tarefas.services.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class TaskController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Task> addTask(@RequestBody Task task, @PathVariable Long userId){
+    public ResponseEntity<Task> addTask(@Valid @RequestBody Task task, @PathVariable Long userId){
         var tasks = service.addTask(task,userId);
 
         return ResponseEntity
