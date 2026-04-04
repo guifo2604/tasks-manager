@@ -1,54 +1,67 @@
 package br.com.projeto.gerenciador_de_tarefas.controllers;
 
 
+import br.com.projeto.gerenciador_de_tarefas.dto.TaskRequest;
+import br.com.projeto.gerenciador_de_tarefas.dto.TaskResponse;
 import br.com.projeto.gerenciador_de_tarefas.models.Task;
+import br.com.projeto.gerenciador_de_tarefas.repositories.TaskRepository;
 import br.com.projeto.gerenciador_de_tarefas.services.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
 
-    @Autowired
-    private TaskService service;
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @GetMapping("/user/{userId}")
-    public List<Task> getTasks(@PathVariable Long userId){
-        return service.getTaskByUser(userId);
+    public ResponseEntity<List<TaskResponse>> getTasks(@PathVariable Long userId){
+    List<Task> tasks = taskService.getTaskByUser(userId);
+    List<TaskResponse> response = tasks.stream()
+            .map(TaskResponse::fromEntity)
+            .toList();
+    return ResponseEntity.ok(response);
+
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Task> addTask(@Valid @RequestBody Task task, @PathVariable Long userId){
-        var tasks = service.addTask(task,userId);
+    public ResponseEntity<TaskResponse> addTask(@Valid @RequestBody TaskRequest taskRequest, @PathVariable Long userId){
+        var task = taskRequest.toEntity();
+
+        var tasks = taskService.addTask(task,userId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(tasks);
+                .body(TaskResponse.fromEntity(tasks));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        return service.getTaskById(id)
-                .map((t) -> ResponseEntity.ok(t))
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id)
+                .map((t) -> ResponseEntity.ok(TaskResponse.fromEntity(t)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}/user/{userId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id, @PathVariable Long userId){
-        service.deleteTask(id, userId);
+        taskService.deleteTask(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}/user/{userId}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @PathVariable Long userId, @RequestBody Task newTask){
-        Task task = service.updateTask(id, newTask, userId);
-        return ResponseEntity.ok(task);
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @PathVariable Long userId, @RequestBody @Valid TaskRequest newTaskRequest){
+        Task task = taskService.updateTask(id, newTaskRequest.toEntity(), userId);
+        return ResponseEntity.ok(TaskResponse.fromEntity(task));
         }
 
 }

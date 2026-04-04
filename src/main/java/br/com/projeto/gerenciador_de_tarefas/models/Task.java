@@ -7,11 +7,13 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+@Builder
 @Data
 @Entity
 @Table(name = "TB_TASK")
@@ -21,20 +23,15 @@ public class Task {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "O titulo nao pode ser vazio!")
     private String title;
-    @NotBlank(message = "A legenda / subtitulo não pode ser em branco!")
     private String caption;
-    @NotBlank(message = "O conteudo não pode estar em branco!")
     private String content;
 
-    @NotNull(message = "O status da tarefa não pode ser nulo")
     @Enumerated(EnumType.STRING)
     private Status status;
-    @FutureOrPresent(message = "A data inicial não pode ser no passado")
-    private LocalDateTime dataInicial;
+    private LocalDate dataInicial;
     @FutureOrPresent(message = "A data final não pode ser no passado")
-    private LocalDateTime dataFinal;
+    private LocalDate dataFinal;
 
 
     @ManyToOne

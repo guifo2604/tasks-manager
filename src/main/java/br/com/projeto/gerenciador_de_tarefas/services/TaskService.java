@@ -25,7 +25,7 @@ public class TaskService {
         return repository.findBy_IdUser(userId);
     }
 
-    public Task addTask(@org.jetbrains.annotations.NotNull Task task, Long userId){
+    public Task addTask( Task task, Long userId){
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
         task.setUser(user);

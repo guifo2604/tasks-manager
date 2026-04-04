@@ -1,15 +1,17 @@
 package br.com.projeto.gerenciador_de_tarefas.controllers;
 
 
+import br.com.projeto.gerenciador_de_tarefas.dto.UserRequest;
+import br.com.projeto.gerenciador_de_tarefas.dto.UserResponse;
 import br.com.projeto.gerenciador_de_tarefas.models.User;
-import br.com.projeto.gerenciador_de_tarefas.models.UserLogin;
 import br.com.projeto.gerenciador_de_tarefas.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,34 +20,30 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserService loginService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
-                .map((u) ->ResponseEntity.ok(u))
+                .map(user -> ResponseEntity.ok(UserResponse.fromEntity(user)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@Valid @RequestBody User user){
-        var users = userService.addUser(user, user.getPassword());
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(users);
+    public ResponseEntity<UserResponse> addUser(@RequestBody @Valid UserRequest userRequest){
+        User savedUser = userService.addUser(userRequest.toEntity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromEntity(savedUser));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        userService.deleteUser(id);
+        userService.deleteUser(id)
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User newUser){
-        User user = userService.updateUser(id, newUser);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest){
+        User user = userService.updateUser(id, userRequest.toEntity());
+        return ResponseEntity.ok(UserResponse.fromEntity(user));
     }
 
 

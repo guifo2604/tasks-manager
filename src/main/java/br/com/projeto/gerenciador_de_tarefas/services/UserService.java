@@ -1,8 +1,6 @@
 package br.com.projeto.gerenciador_de_tarefas.services;
 
 import br.com.projeto.gerenciador_de_tarefas.models.User;
-import br.com.projeto.gerenciador_de_tarefas.models.UserLogin;
-import br.com.projeto.gerenciador_de_tarefas.repositories.UserLoginRepository;
 import br.com.projeto.gerenciador_de_tarefas.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,31 +12,24 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private UserLoginRepository loginRepository;
+    private final UserRepository userRepository;
 
-    @Transactional
-    public User addUser(User user, String password){
-        User savedUser = userRepository.save(user);
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-        UserLogin login = new UserLogin();
-        login.setUser(savedUser);
-        login.setEmail(savedUser.getEmail());
-        login.setPassword(password);
+    public User addUser(User user){
+        return userRepository.save(user);
 
-        loginRepository.save(login);
-        return savedUser;
     }
 
     public Optional<User> getUserById(Long id){
         return userRepository.findById(id);
     }
 
-    public Optional<UserLogin> getUserByEmail(String email){
-        return loginRepository.findByEmail(email);
+    public Optional<User> getUserByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     public User login(String email, String password){
@@ -46,11 +37,11 @@ public class UserService {
         if(optionalUser.isEmpty()){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado, e-mail ou senha incorretos");
         }
-        UserLogin login = optionalUser.get();
-        if(!login.getPassword().equals(password)){
+        User loginU = optionalUser.get();
+        if(!loginU.getPassword().equals(password)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha incorreta, tente novamente!");
         }
-        return login.getUser();
+        return loginU;
 
     }
 
@@ -60,16 +51,19 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
         userRepository.deleteById(id);
-        loginRepository.deleteById(id);
     }
 
-    public User updateUser(Long id, User newUser){
-        var optionalUser = getUserById(id);
-        if (optionalUser.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!");
-        }
-        newUser.setIdUser(id);
-        return userRepository.save(newUser);
+    public User updateUser(Long id, User userData) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setUsername(userData.getUsername());
+                    user.setEmail(userData.getEmail());
+                    if (userData.getPassword() != null && !userData.getPassword().isBlank()) {
+                        user.setPassword(userData.getPassword());
+                    }
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 
 
