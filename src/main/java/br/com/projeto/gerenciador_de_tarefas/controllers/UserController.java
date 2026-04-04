@@ -1,6 +1,7 @@
 package br.com.projeto.gerenciador_de_tarefas.controllers;
 
 
+import br.com.projeto.gerenciador_de_tarefas.dto.LoginRequest;
 import br.com.projeto.gerenciador_de_tarefas.dto.UserRequest;
 import br.com.projeto.gerenciador_de_tarefas.dto.UserResponse;
 import br.com.projeto.gerenciador_de_tarefas.models.User;
@@ -17,9 +18,11 @@ import java.util.List;
 @RequestMapping("/auth")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
@@ -34,9 +37,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromEntity(savedUser));
     }
 
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@RequestBody @Valid LoginRequest loginRequest){
+        User user = userService.login(loginRequest);
+        return ResponseEntity.ok(UserResponse.fromEntity(user));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        userService.deleteUser(id)
+        userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
