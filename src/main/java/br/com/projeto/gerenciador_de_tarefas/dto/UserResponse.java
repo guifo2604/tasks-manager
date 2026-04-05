@@ -6,7 +6,7 @@ public record UserResponse(
 
     Long idUser,
     String username,
-    String email,
+    String email
 
 ) {
 

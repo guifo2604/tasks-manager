@@ -2,8 +2,10 @@ package br.com.projeto.gerenciador_de_tarefas.controllers;
 
 
 import br.com.projeto.gerenciador_de_tarefas.dto.LoginRequest;
+import br.com.projeto.gerenciador_de_tarefas.dto.LoginResponse;
 import br.com.projeto.gerenciador_de_tarefas.dto.UserRequest;
 import br.com.projeto.gerenciador_de_tarefas.dto.UserResponse;
+import br.com.projeto.gerenciador_de_tarefas.infrastructure.security.TokenService;
 import br.com.projeto.gerenciador_de_tarefas.models.User;
 import br.com.projeto.gerenciador_de_tarefas.services.UserService;
 import jakarta.validation.Valid;
@@ -19,9 +21,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final TokenService tokenService;
 
-    public UserController(UserService userService) {
+
+    public UserController(UserService userService,  TokenService tokenService) {
         this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("/{id}")
@@ -39,9 +44,10 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody @Valid LoginRequest loginRequest){
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest){
         User user = userService.login(loginRequest);
-        return ResponseEntity.ok(UserResponse.fromEntity(user));
+        String token = tokenService.generateToken(user);
+        return ResponseEntity.ok(new LoginResponse(UserResponse.fromEntity(user), token));
     }
 
     @DeleteMapping("/{id}")
