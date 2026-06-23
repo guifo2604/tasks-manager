@@ -53,7 +53,8 @@ public CorsConfigurationSource corsConfigurationSource() {
     
     configuration.setAllowedOrigins(List.of(
         "http://localhost:5173", 
-        "https://task-manager-frontend-beryl-six.vercel.app"
+        "https://task-manager-frontend-beryl-six.vercel.app",
+        "https://tasks--app.vercel.app/"
     ));
     
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
