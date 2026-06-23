@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<UserResponse> addUser(@RequestBody @Valid UserRequest userRequest){
         User savedUser = userService.addUser(userRequest.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromEntity(savedUser));
-    }
+}
 
 
     @PostMapping("/login")
